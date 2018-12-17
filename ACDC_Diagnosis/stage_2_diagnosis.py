@@ -20,7 +20,7 @@ from datetime import datetime
 import time
 from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, cross_val_predict
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn import svm
@@ -46,13 +46,14 @@ validation = './training_data/Cardiac_parameters_validation.csv'
 
 # Path to cardiac features generated from segmentations predicted by the segmentation network
 test_on_prediction = './prediction_data/Cardiac_parameters_prediction.csv'
+# test_on_prediction = './prediction_data/Cardiac_parameters_minmax_k_16.csv'
+
 
 # Features columns selection
 # The second stage model uses Myocardial Wall variation profile features at Systole
 START_COL = 13
 END_COL = 17
 class_names = [MINF, DCM]
-
 
 def visualize_tree(tree, feature_names, save_dir='./'):
     """Create tree png using graphviz.
@@ -115,8 +116,8 @@ def plot_confusion_matrix(cm, classes,
     Normalization can be applied by setting `normalize=True`.
     """
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
+    # plt.title(title)
+    # plt.colorbar()
     tick_marks = np.arange(len(classes))
     plt.xticks(tick_marks, classes, rotation=45)
     plt.yticks(tick_marks, classes)
@@ -278,6 +279,8 @@ if __name__ == '__main__':
     print ('Doing cross-validation for Ensemble')
     # Cross-validation on full training_set
     train_df, _ = encode_target(load_dataframe(full_training, column = 'GROUP'), 'GROUP', heart_disease_label_map)
+    train_df = train_df.reset_index(drop=True)
+
     # Select the features:
     features = list(train_df.columns[np.r_[START_COL:END_COL]])
     # Scale the feature vectors using standard scaler
@@ -302,12 +305,31 @@ if __name__ == '__main__':
     for clf, label in zip([LR_clf, RF_clf, GNB_clf, XG_clf, SVM_clf, MLP_clf, KNN_clf, E_clf], 
         ['Logistic Regression', 'Random Forest', 'naive Bayes', 'XG_boost', 'SVM', 'MLP', 'KNN', 'Ensemble']):
         scores = cross_val_score(clf, X_scaled, y, cv=5, scoring='accuracy')
+        print (scores)
         print("Accuracy: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(), label))
+        predictions = cross_val_predict(clf, X_scaled, y, cv=5)
+        incorrect_idx = np.nonzero(predictions != y)[0]
+        print (predictions)
+        print (incorrect_idx)
+        print (train_df['Name'][incorrect_idx])
+        print ('Truth', [class_names[x] for x in y[incorrect_idx]])
+        print ('Predicted', [class_names[x] for x in predictions[incorrect_idx]])
+        # Confusion matrix
+        cnf_matrix = confusion_matrix(y, predictions)
+        np.set_printoptions(precision=2)
 
+        # Plot non-normalized confusion matrix
+        plt.figure()
+        plot_confusion_matrix(cnf_matrix, classes=class_names,
+                              title='Confusion matrix: {} classifier on Validation Set'.format(label))
+        # plt.show()
+        plt.savefig(save_dir+'/confusion_matrix__2_{}'.format(label))
     #********************* Evaluate MLP classifier model on Validation Set******************************# 
     scaler = StandardScaler()
     scaler.fit(X) 
     EN_clf = MLP_clf.fit(scaler.transform(X), y)
+    # EN_clf = E_clf.fit(scaler.transform(X), y)
+
     ##################### Automated Caridiac Diagnosis on Final Test data ########################### 
     # No Group/label is available in final test dataset 
     CardiacDiagnosisModelTester(EN_clf, test_on_prediction, name='MLPOnFinalTestSet', scaler=scaler, save_dir=save_dir, label_available=False,

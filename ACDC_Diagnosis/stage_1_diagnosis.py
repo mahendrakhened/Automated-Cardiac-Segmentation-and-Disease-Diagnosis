@@ -20,7 +20,7 @@ from datetime import datetime
 import time
 from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import cross_val_score, cross_val_predict
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
 from sklearn import svm
@@ -58,11 +58,14 @@ validation = './training_data/Cardiac_parameters_validation.csv'
 # Path to cardiac features generated from segmentations predicted by the segmentation network
 test_on_prediction = './prediction_data/Cardiac_parameters_prediction.csv'
 
+# test_on_prediction = './prediction_data/Cardiac_parameters_minmax_k_16.csv'
+
 # Features columns selection
 START_COL = 1
 END_COL = 21
 
 class_names = [NOR, MINF, DCM, HCM, RV]
+class_names_for_cm = [NOR, MINF, DCM, HCM, 'ARV']
 
 def visualize_tree(tree, feature_names, save_dir='./'):
     """Create tree png using graphviz.
@@ -125,8 +128,8 @@ def plot_confusion_matrix(cm, classes,
     Normalization can be applied by setting `normalize=True`.
     """
     plt.imshow(cm, interpolation='nearest', cmap=cmap)
-    plt.title(title)
-    plt.colorbar()
+    # plt.title(title)
+    # plt.colorbar()
     tick_marks = np.arange(len(classes))
     plt.xticks(tick_marks, classes, rotation=45)
     plt.yticks(tick_marks, classes)
@@ -224,7 +227,7 @@ if __name__ == '__main__':
     np.set_printoptions(precision=2)
     # Plot non-normalized confusion matrix
     plt.figure()
-    plot_confusion_matrix(cnf_matrix, classes=class_names,
+    plot_confusion_matrix(cnf_matrix, classes=class_names_for_cm,
                           title='Confusion matrix: Random Forest classifier on Validation Set')
     # plt.show()
     plt.savefig(save_dir+'/confusion_matrix_Manual_RF')
@@ -249,7 +252,7 @@ if __name__ == '__main__':
 
     # Plot non-normalized confusion matrix
     plt.figure()
-    plot_confusion_matrix(cnf_matrix, classes=class_names,
+    plot_confusion_matrix(cnf_matrix, classes=class_names_for_cm,
                           title='Confusion matrix: MLP classifier on Validation Set')
     # plt.show()
     plt.savefig(save_dir+'/confusion_matrix_Manual_MLP')
@@ -317,16 +320,35 @@ if __name__ == '__main__':
     KNN_clf = KNeighborsClassifier(n_neighbors=5)
 
     # Voting Classifier 
-    E_clf = VotingClassifier(estimators=[('mlp', MLP_clf),  ('gnb', GNB_clf), ('svm', SVM_clf), ('rf', RF_clf)], voting='hard')
+    E_clf = VotingClassifier(estimators=[('mlp', MLP_clf),  ('gnb', GNB_clf), ('svm', SVM_clf), ('rf', RF_clf)], voting='soft')
 
-    # for clf, label in zip([LR_clf, RF_clf, GNB_clf, XG_clf, SVM_clf, MLP_clf, KNN_clf, E_clf], ['Logistic Regression', 'Random Forest', 'naive Bayes', 'XG_boost', 'SVM', 'MLP', 'KNN', 'Ensemble']):
-    #     scores = cross_val_score(clf, X_scaled, y, cv=5, scoring='accuracy')
-    #     print("Accuracy: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(), label))
+    for clf, label in zip([LR_clf, RF_clf, GNB_clf, XG_clf, SVM_clf, MLP_clf, KNN_clf, E_clf], ['Logistic Regression', 'Random Forest', 'Naive Bayes', 'XG_boost', 'SVM', 'MLP', 'KNN', 'Ensemble']):
+        scores = cross_val_score(clf, X_scaled, y, cv=5, scoring='accuracy')
+        print (scores)
+        print("Accuracy: %0.2f (+/- %0.2f) [%s]" % (scores.mean(), scores.std(), label))
+        predictions = cross_val_predict(clf, X_scaled, y, cv=5)
+        incorrect_idx = np.nonzero(predictions != y)[0]
+        print (predictions)
+        print (incorrect_idx)
+        print (train_df['Name'][incorrect_idx])
+        print ('Truth', [class_names[x] for x in y[incorrect_idx]])
+        print ('Predicted', [class_names[x] for x in predictions[incorrect_idx]])
+        cnf_matrix = confusion_matrix(y, predictions)
+        np.set_printoptions(precision=2)
 
+        # Plot non-normalized confusion matrix
+        plt.figure()
+        plot_confusion_matrix(cnf_matrix, classes=class_names_for_cm,
+                              title='Confusion matrix: {} classifier'.format(label))
+        # plt.show()
+        plt.savefig(save_dir+'/confusion_matrix_Manual_{}'.format(label))
     #********************* Evaluate Ensemble classifier model on Validation Set******************************# 
-    # EN_clf = E_clf.fit(X_scaled, y)
+    EN_clf = E_clf.fit(X_scaled, y)
     # TODO: If preferred Naive Bayes over Ensemble 
-    EN_clf = GNB_clf.fit(X_scaled, y)
+    # EN_clf = GNB_clf.fit(X_scaled, y)
+    # EN_clf = MLP_clf.fit(X_scaled, y)
+    # EN_clf = SVM_clf.fit(X_scaled, y)
+    # EN_clf = RF_clf.fit(X_scaled, y)
     ##################### Automated Caridiac Diagnosis on Final Test data ########################### 
     # No Group/label is available in final test dataset 
     CardiacDiagnosisModelTester(EN_clf, test_on_prediction, name='EnsembleOnFinalTestSet', scaler=scaler, save_dir=save_dir, label_available=False,

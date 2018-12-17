@@ -24,7 +24,7 @@ def calculate_metrics_from_pred(data_path, pred_name='prediction'):
         m = re.match("patient(\d{3})", patient)
         patient_No = int(m.group(1))
         if patient_No not in seen_patient:
-            print patient
+            print (patient)
             seen_patient.append(patient_No)       
             # print patient_No
             ed = "patient%03d_ED.nii" %(patient_No)
@@ -83,10 +83,10 @@ def calculate_metrics_from_pred(data_path, pred_name='prediction'):
             r.append(heart_param['ED_MYO_STD_AVG_T'])
             r.append(heart_param['ED_MYO_AVG_STD_T'])
             r.append(heart_param['ED_MYO_STD_STD_T'])
-            # Apppend Blank for Stage 1 & 2 results to be populated
-            r.append('')
+            # Apppend Blank for Stage 1 results to be populated
             r.append('')
             res.append(r) 
+        # break
     df = pd.DataFrame(res, columns=HEADER[:len(HEADER)])
     if not os.path.exists('./prediction_data'):
         os.makedirs('./prediction_data')
@@ -95,5 +95,6 @@ def calculate_metrics_from_pred(data_path, pred_name='prediction'):
 if __name__ == '__main__':
     # Data directories:
     # Path to final test set segmentation results of ACDC 2017 challenge
-    test_prediction_path = '../../ACDC_DataSet/ACDC_17_TestSegmentationResults'
-    calculate_metrics_from_pred(test_prediction_path)
+    # test_prediction_path = '../../ACDC_DataSet/ACDC_17_TestSegmentationResults'
+    test_prediction_path = '/media/brats/0d4a2225-d6b1-4b80-94fd-7c8ae0b1fa102/MAK/Cardiac/ACDC_Project/models/FIRD_ACDC_P_3_k_16_WCE_WDICE_AUG_256_minmax/predictions_BN_F20180407_120744/leaderboard'
+    calculate_metrics_from_pred(test_prediction_path, pred_name='minmax_k_16')
