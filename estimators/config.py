@@ -5,7 +5,7 @@ import os
 class conf(object):
 	def __init__(self,
 				data_path = '../../processed_acdc_dataset/hdf5_files',
-				output_dir = '../../models/ACDC',
+				output_dir = '../../trained_models/ACDC',
 				run_name = 'FCRD_ACDC_K_16',
 				batch_size = 16,
 				num_class = 4,
@@ -14,7 +14,7 @@ class conf(object):
 				learning_rate = 1e-4,
 				prediction_batch_size = 16,
 				load_model_from = None,
-				# load_model_from = os.path.join('../../models/ACDC', 'FCRD_ACDC_128', 'models','latest.ckpt'),
+				# load_model_from = os.path.join('../../models/ACDC', 'FCRD_ACDC_K_16', 'models','latest.ckpt'),
 				resume_training = False
 				):
 

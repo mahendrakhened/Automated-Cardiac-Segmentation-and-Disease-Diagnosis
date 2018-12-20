@@ -487,7 +487,7 @@ def load_nii(img_file, folder_path):
 
 def get_test_data_acdc(src_path, patient, gt_available=False):
     """
-    Segregate the splits into LA and SA views and dump all files in a common folder
+    Code to read testing data from acdc
     """
     gt_file_path_list = None
 

@@ -22,9 +22,19 @@ If you find this implementation useful in your research, please consider citing:
 ### ACDC Data Preparation
 1. Register and download ACDC-2017 dataset from https://www.creatis.insa-lyon.fr/Challenge/acdc/index.html
 2. Create a folder outside the project with name **ACDC_DataSet** and copy the dataset.
-3. From the project folder open file data_preprocess/acdc_data_preparation.py
-4. In the file, set the path to ACDC training dataset is pointed as: ```complete_data_path = '../../ACDC_DataSet/training' ```
-5. Run the script acdc_data_preparation.py
+3. From the project folder open file data_preprocess/acdc_data_preparation.py.
+4. In the file, set the path to ACDC training dataset is pointed as: ```complete_data_path = '../../ACDC_DataSet/training' ```.
+5. Run the script acdc_data_preparation.py.
+6. The processed data for training is generated outside the project folder named *processed_acdc_dataset*.
 
 ### Steps to train the model:
+1. From the project folder open file estimators/train.py and configure the network hyper-parameters.
+2. From the project folder open file estimators/config.py and configure the training hyper-parameters.
+3. Run the script train.py.
+4. Outside the project in the folder named *trained_models/ACDC/* the model weights and tensorboard summary are saved.
+5. While training the training summary can be accessed running: ```tensorboard --logdir='path_to/trained_models/ACDC/FCRD_ACDC/summary' ```.
 
+### Steps to test the model:
+1. From the project folder open file estimators/test.py and configure the testing hyper-parameters, path to trained model weights and ACDC-2017 testing dataset.
+2. Run the script test.py.
+3. The predictions are saved in the path *trained_models/ACDC/FCRD_ACDC/predictions_TIMESTAMP*
