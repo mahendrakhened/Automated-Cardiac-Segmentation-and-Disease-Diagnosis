@@ -16,3 +16,7 @@ If you find this implementation useful in your research, please consider citing:
   publisher={Elsevier}
 }
 ```
+
+### Usage
+
+Steps to train the model:
