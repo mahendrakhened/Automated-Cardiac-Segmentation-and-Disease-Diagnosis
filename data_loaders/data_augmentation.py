@@ -140,7 +140,7 @@ def PreProcessData(file_name, data, mode, transformation_params, Alternate=True)
     return (patch_image, patch_label, weight_map)
 
 # Functions
-def normalize(image, scheme='minmax'):
+def normalize(image, scheme='zscore'):
     # Do Image Normalization:
     if scheme == 'zscore':
         image = normalize_zscore(image, z=0.5, offset=0)
@@ -593,7 +593,7 @@ def multilabel_transform(img, tf, output_shape, nlabel, mode='constant', order=0
     bin_img_stack = multilabel_binarize(img, nlabel)
     n_labels = len(bin_img_stack)
     tf_bin_img_stack = np.zeros((n_labels,) + output_shape, dtype='uint8')
-    for label in xrange(n_labels):
+    for label in range(n_labels):
         tf_bin_img_stack[label] = fast_warp(bin_img_stack[label], tf, output_shape=output_shape, mode=mode, order=order)
     # Do merge operation along the axis = 0
     return np.argmax(tf_bin_img_stack, axis=0)

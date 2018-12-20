@@ -52,10 +52,11 @@ class DataIterator(object):
         if self.mode == 'train': 
             train_files = [os.path.join(self.data_path,'train_set',f) 
                         for f in os.listdir(os.path.join(self.data_path,'train_set'))]
-            valid_files = [os.path.join(self.data_path,'validation_set',f) 
-                        for f in os.listdir(os.path.join(self.data_path,'validation_set'))]
-            # self.files = train_files
-            self.files = train_files + valid_files
+            self.files = train_files
+
+            # valid_files = [os.path.join(self.data_path,'validation_set',f) 
+            #             for f in os.listdir(os.path.join(self.data_path,'validation_set'))]
+            # self.files = train_files + valid_files
 
             # Uncomment to train on only ES phase images  
             # self.files = glob.glob(os.path.join(self.data_path,'train_set', '*ES*'))
@@ -66,10 +67,11 @@ class DataIterator(object):
         elif self.mode == 'valid':  
             valid_files = [os.path.join(self.data_path,'validation_set',f) 
                         for f in os.listdir(os.path.join(self.data_path,'validation_set'))]
-            test_files = [os.path.join(self.data_path,'test_set',f) 
-                        for f in os.listdir(os.path.join(self.data_path,'test_set'))]
-            # self.files = valid_files
-            self.files = test_files
+            self.files = valid_files
+            # test_files = [os.path.join(self.data_path,'test_set',f) 
+            #             for f in os.listdir(os.path.join(self.data_path,'test_set'))]
+            # self.files = test_files
+
             # Uncomment to train on only ES phase images  
             # self.files = glob.glob(os.path.join(self.data_path,'validation_set', '*ES*'))
 

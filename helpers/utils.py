@@ -1,5 +1,5 @@
-import cPickle as pickle
-import os, re
+import pickle
+import os, re, sys
 import shutil
 import nibabel as nib
 from scipy.fftpack import fftn, ifftn
@@ -10,7 +10,22 @@ try:
     import matplotlib.pyplot as plt
     from matplotlib import animation
 except:
-    print 'matplotlib not imported'
+    print ('matplotlib not imported')
+
+
+def progress_bar(curr_idx, max_idx, time_step, repeat_elem = "_"):
+    max_equals = 55
+    step_ms = int(time_step*1000)
+    num_equals = int(curr_idx*max_equals/float(max_idx))
+    len_reverse =len('Step:%d ms| %d/%d ['%(step_ms, curr_idx, max_idx)) + num_equals
+    sys.stdout.write("Step:%d ms|%d/%d [%s]" %(step_ms, curr_idx, max_idx, " " * max_equals,))
+    sys.stdout.flush()
+    sys.stdout.write("\b" * (max_equals+1))
+    sys.stdout.write(repeat_elem * num_equals)
+    sys.stdout.write("\b"*len_reverse)
+    sys.stdout.flush()
+    if curr_idx == max_idx:
+        print('\n')
 
 def read_fft_volume(data4D, harmonic=1):
     zslices = data4D.shape[2]
@@ -31,7 +46,7 @@ def save_data(data, filename, out_path):
     out_filename = os.path.join(out_path, filename)
     with open(out_filename, 'wb') as f:
         pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
-    print 'saved to %s' % out_filename
+    print ('saved to %s' % out_filename)
 
 def load_pkl(path):
     with open(path) as f:
@@ -74,7 +89,7 @@ def plot_roi(data4D, roi_center, roi_radii):
     """
     x_roi_center, y_roi_center = roi_center[0], roi_center[1]
     x_roi_radius, y_roi_radius = roi_radii[0], roi_radii[1]
-    print 'nslices', data4D.shape[2]
+    print ('nslices', data4D.shape[2])
 
     zslices = data4D.shape[2]
     tframes = data4D.shape[3]
@@ -107,7 +122,7 @@ def plot_4D(data4D):
     """
     Do the animation of full heart volume
     """
-    print 'nslices', data4D.shape[2]
+    print ('nslices', data4D.shape[2])
     zslices = data4D.shape[2]
     tframes = data4D.shape[3]
 
@@ -162,8 +177,3 @@ def reorder_vol(data):
     ES_GT = swapaxes_slv(data[1][1])
     ES_PD = swapaxes_slv(data[1][2])
     return (ED_GT, ES_GT, ED_PD, ES_PD)
-
-def save_nii(vol, affine, hdr, path, prefix, suffix):
-    vol = nib.Nifti1Image(vol, affine, hdr)
-    vol.set_data_dtype(np.uint8)
-    nib.save(vol, os.path.join(path, prefix+'_'+suffix))

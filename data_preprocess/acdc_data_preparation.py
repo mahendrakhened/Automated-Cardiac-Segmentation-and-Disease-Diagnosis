@@ -555,7 +555,7 @@ class Dataset(object):
             img_4d_name = "patient%03d_4d.nii.gz"%patient_No
             # Load data
             img_4D, _, hdr = self.load_nii(img_4d_name)
-            c, r = extract_roi_fft(img_4D, hdr.get_zooms()) 
+            c, r = extract_roi_stddev(img_4D, hdr.get_zooms()) 
             self.patient_data['roi_center'], self.patient_data['roi_radii']=c,r 
             self.patient_data['4D'] = img_4D
 #             print c, r
@@ -579,18 +579,18 @@ if __name__ == '__main__':
   start_time = time.time()
   # Path to ACDC training database
   complete_data_path = '../../ACDC_DataSet/training'
-  dest_path = '../../processed_acdc_dataset_v3'
-  group_path = '../../processed_acdc_dataset_v3/Patient_Groups'
+  dest_path = '../../processed_acdc_dataset'
+  group_path = '../../processed_acdc_dataset/Patient_Groups'
 
   # Training dataset
-  train_dataset = '../../processed_acdc_dataset_v3/dataset/train_set'
-  validation_dataset = '../../processed_acdc_dataset_v3/dataset/validation_set'
-  test_dataset = '../../processed_acdc_dataset_v3/dataset/test_set'
-  out_path_train = '../../processed_acdc_dataset_v3/pickled/full_data'
-  hdf5_out_path = '../../processed_acdc_dataset_v3/hdf5_files'
+  train_dataset = '../../processed_acdc_dataset/dataset/train_set'
+  validation_dataset = '../../processed_acdc_dataset/dataset/validation_set'
+  test_dataset = '../../processed_acdc_dataset/dataset/test_set'
+  out_path_train = '../../processed_acdc_dataset/pickled/full_data'
+  hdf5_out_path = '../../processed_acdc_dataset/hdf5_files'
   #Final Test dataset
   final_testing_dataset = '../../ACDC_DataSet/testing'
-  out_path_test = '../../processed_acdc_dataset_v3/pickled/final_test'
+  out_path_test = '../../processed_acdc_dataset/pickled/final_test'
 
   # First perform stratified sampling
   group_patient_cases(complete_data_path, dest_path)
