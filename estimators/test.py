@@ -109,10 +109,9 @@ if __name__ == "__main__":
                 i_time = time.time()
                 result = tester.LoadAndPredict(patient_data, None, None, outputs_shape = None,
                                         preProcessList = ['roi_detect', 'normalize', 'roi_crop'],
-                                        # preProcessList = ['roi_detect', 'roi_crop', 'normalize'],
                                         postProcessList = ['glcc', 'glcc_2D', 'pad_patch'],
                                         # preProcessList = ['crop_pad_4d', 'normalize'],
-                                        # postProcessList = ['glcc', 'binary_closing'],
+                                        # postProcessList = ['glcc', 'glcc_2D'],
                                         crf = None,
                                         patch_size=(128, 128),
                                         save_path = os.path.join(saved_model_dir, base_folder, patient_folders[i])

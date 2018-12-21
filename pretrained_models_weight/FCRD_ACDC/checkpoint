@@ -1,0 +1,6 @@
+model_checkpoint_path: "latest.ckpt"
+all_model_checkpoint_paths: "..\\best_model_class1\\latest.ckpt"
+all_model_checkpoint_paths: "..\\best_model_class3\\latest.ckpt"
+all_model_checkpoint_paths: "..\\models\\latest.ckpt"
+all_model_checkpoint_paths: "..\\best_model\\latest.ckpt"
+all_model_checkpoint_paths: "latest.ckpt"

@@ -6,15 +6,16 @@ class conf(object):
 	def __init__(self,
 				data_path = '../../processed_acdc_dataset/hdf5_files',
 				output_dir = '../../trained_models/ACDC',
-				run_name = 'FCRD_ACDC_K_16',
+				run_name = 'FCRD_ACDC',
 				batch_size = 16,
 				num_class = 4,
 				num_channels = 1,
 				num_epochs = 250,
-				learning_rate = 1e-4,
+				learning_rate = 1e-3,
 				prediction_batch_size = 16,
-				load_model_from = None,
-				# load_model_from = os.path.join('../../models/ACDC', 'FCRD_ACDC_K_16', 'models','latest.ckpt'),
+				load_pretrained_model_from = None,
+				# Uncomment incase of loading pre-trained model weights and comment the line above
+				# load_pretrained_model_from = os.path.join('../pretrained_models_weight', 'FCRD_ACDC','latest.ckpt'),
 				resume_training = False
 				):
 
@@ -27,11 +28,9 @@ class conf(object):
 		self.num_epochs = num_epochs
 		self.learning_rate = learning_rate
 		self.prediction_batch_size = prediction_batch_size
-		self.load_model_from = load_model_from
+		self.load_pretrained_model_from = load_pretrained_model_from
 		self.resume_training = resume_training
 		run_dir = os.path.join(output_dir,run_name)
-		# if self.load_model_from is None:
-		# 	self.load_model_from = os.path.join(run_dir,'models','latest.ckpt')
 		self.summary_dir = os.path.join(output_dir, run_name,'summary')
 		self.freq_list = ['per_step', 'per_100_steps', 'per_epoch']
 

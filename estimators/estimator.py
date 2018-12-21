@@ -2,7 +2,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import tensorflow as tf 
+import tensorflow as tf
+from tensorflow.python import debug as tf_debug 
 import numpy as np 
 import os, sys
 import pprint
@@ -45,6 +46,7 @@ class Estimator(object):
         sess_config.allow_soft_placement = True
         sess_config.gpu_options.allow_growth = True
         self.sess = tf.Session(config = sess_config)
+        # self.sess = tf_debug.TensorBoardDebugWrapperSession(self.sess, "localhost:7000")
         self.sess.run(tf.global_variables_initializer())        
         try:
             self.sess.run(tf.assert_variables_initialized())
@@ -52,10 +54,10 @@ class Estimator(object):
             raise RuntimeError('Not all variables initialized')
 
         self.saver = tf.train.Saver(tf.global_variables())
-        if conf.load_model_from: 
+        if conf.load_pretrained_model_from: 
             if conf.resume_training:
-                print('Restoring model from: ' + str(conf.load_model_from))
-                self.saver.restore(self.sess, conf.load_model_from)
+                print('Restoring model from: ' + str(conf.load_pretrained_model_from))
+                self.saver.restore(self.sess, conf.load_pretrained_model_from)
                 self.numKeeper.UpdateCounts(self.sess.run(self.numKeeper.tf_counts))
                 print("\nWhile restoring : ")
                 print(self.sess.run(self.numKeeper.tf_counts))
@@ -65,8 +67,8 @@ class Estimator(object):
                 print('Epochs completed : ' + str(self.numKeeper.counts['epoch']))
                 print('Best average Dice: ' + str(self.numKeeper.counts['avgDice_score']))
             else:
-                print('Restoring model from: ' + str(conf.load_model_from))
-                self.saver.restore(self.sess, conf.load_model_from)
+                print('Restoring model from: ' + str(conf.load_pretrained_model_from))
+                self.saver.restore(self.sess, conf.load_pretrained_model_from)
 
     def SaveModel(self, save_path):
         self.sess.run(self.numKeeper.AssignNpToTfVariables(self.numKeeper.counts))
