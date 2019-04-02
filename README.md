@@ -38,3 +38,10 @@ If you find this reference implementation useful in your research, please consid
 1. From the project folder open file estimators/test.py and configure the testing hyper-parameters, path to trained model weights and ACDC-2017 testing dataset.
 2. Run the script test.py.
 3. The predictions are saved in the path *trained_models/ACDC/FCRD_ACDC/predictions_TIMESTAMP*
+
+### Cardiac Diagnosis
+1. Extract Features from the training dataset by running: generate_cardiac_features_train.py 
+2. Extract Features from the testing dataset by running: generate_cardiac_features_test.py
+3. Run the scripts stage_1_diagnosis.py and stage_2_diagnosis.py in sequence
+4. The final cardiac disease prediction results on the test set are generated in the *prediction* folder
+
